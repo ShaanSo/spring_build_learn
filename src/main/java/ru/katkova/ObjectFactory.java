@@ -36,10 +36,7 @@ public class ObjectFactory {
 
     @SneakyThrows
     public <T> T createObject(Class<T> type) {
-        Class<? extends T> implClass = type;
-        if (type.isInterface()) {
-            implClass = config.getImplClass(type);
-        }
+
 
         T t = implClass.getDeclaredConstructor().newInstance();
 

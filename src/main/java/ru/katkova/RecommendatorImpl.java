@@ -1,5 +1,6 @@
 package ru.katkova;
 
+@Singleton
 public class RecommendatorImpl implements Recommendator {
 
     @InjectProperty("wisky")
