@@ -1,11 +1,16 @@
 package ru.katkova;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ApplicationContext {
+    @Setter
     private ObjectFactory factory;
     private Map<Class,Object> cache = new ConcurrentHashMap<>();
+    @Getter
     private Config config;
 
     public ApplicationContext(Config config) {
@@ -25,7 +30,7 @@ public class ApplicationContext {
         T t = factory.createObject(implClass);
 
         if (implClass.isAnnotationPresent(Singleton.class)) {
-            cache.put(type, implClass);
+            cache.put(type, t);
         }
 
         return t;
