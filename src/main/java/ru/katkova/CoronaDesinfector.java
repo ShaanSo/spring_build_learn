@@ -1,5 +1,5 @@
 package ru.katkova;
-
+@Deprecated
 public class CoronaDesinfector {
 
     @InjectByType

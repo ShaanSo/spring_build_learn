@@ -8,9 +8,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.ObjectInputFilter;
 import java.lang.invoke.SerializedLambda;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +22,7 @@ public class ObjectFactory {
 //    private static ObjectFactory objectFactory;
     private final ApplicationContext context;
     private List<ObjectConfigurator> configurators = new ArrayList<>();
+    private List<ProxyConfigurator> proxyConfigurators = new ArrayList<>();
 
 //    private Config config;
 
@@ -38,6 +37,9 @@ public class ObjectFactory {
         for (Class<? extends ObjectConfigurator> aClass : context.getConfig().getScanner().getSubTypesOf(ObjectConfigurator.class)) {
             configurators.add(aClass.getDeclaredConstructor().newInstance());
         }
+        for (Class<? extends ProxyConfigurator> aClass : context.getConfig().getScanner().getSubTypesOf(ProxyConfigurator.class)) {
+            proxyConfigurators.add(aClass.getDeclaredConstructor().newInstance());
+        }
 
     }
 
@@ -47,7 +49,15 @@ public class ObjectFactory {
         T t = create(implClass);
         configure(t);
         invokeInit(implClass, t);
+        t = wrapWithProxyIfNeeded(implClass, t);
 
+        return t;
+    }
+
+    private <T> T wrapWithProxyIfNeeded(Class<T> implClass, T t) {
+        for (ProxyConfigurator proxyConfigurator : proxyConfigurators) {
+            t = (T) proxyConfigurator.replaceWithProxyIfNeeded(t, implClass);
+        }
         return t;
     }
 
